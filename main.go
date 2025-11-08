@@ -9,17 +9,17 @@ import (
 )
 
 func HomeHandler(w http.ResponseWriter, r *http.Request) {
-	w.Write([]byte("Welcome to the forum"))
+	backend.RenderTemplate(w, "index.html", nil)
 }
 
 func main() {
 	database.InitDB("forum.db")
+	backend.LoadTemplates("static/*.html")
 
 	http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("static"))))
 
 	http.HandleFunc("/", HomeHandler)
 	http.HandleFunc("/signup", backend.SignupHandler)
-
 	http.HandleFunc("/login", backend.LoginHandler)
 	http.HandleFunc("/logout", backend.LogoutHandler)
 

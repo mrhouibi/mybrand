@@ -1,0 +1,100 @@
+<!-- index.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Forum — Connect • Discuss • Share</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&family=Playfair+Display:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container header-inner">
+      <a class="brand" href="/">Forum</a>
+      <nav class="main-nav">
+        <a href="/explore">Explore</a>
+        <a href="/login" class="btn btn-ghost">Log in</a>
+        <a href="/signup" class="btn btn-primary">Sign up</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero">
+      <div class="container hero-grid">
+        <div class="hero-content">
+          <h1>Welcome to Forum — where ideas come alive</h1>
+          <p class="lead">Join discussions, share your thoughts, and connect with a vibrant community.</p>
+          <div class="cta-row">
+            <a href="/signup" class="btn btn-cta">Get Started</a>
+            <a href="/explore" class="btn btn-outline">Explore Posts</a>
+          </div>
+          <div class="kpis">
+            <div><strong>120k+</strong><span>members</span></div>
+            <div><strong>45k+</strong><span>posts</span></div>
+            <div><strong>350k+</strong><span>replies</span></div>
+          </div>
+        </div>
+
+        <div class="hero-card">
+          <div class="pill">Featured Post</div>
+          <h3>How to start a weekend project</h3>
+          <p class="muted">Quick tips and step-by-step guides to get you started on any idea.</p>
+          <ul class="recent">
+            <li><a href="#">Best productivity hacks (18 replies)</a></li>
+            <li><a href="#">Remote work setup tips (22 replies)</a></li>
+            <li><a href="#">Portfolio design critique (30 replies)</a></li>
+          </ul>
+          <div class="card-actions">
+            <a href="/new" class="btn btn-sm">Create Post</a>
+            <a href="/explore" class="btn btn-sm btn-ghost">Browse Posts</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="features container">
+      <div class="feature">
+        <h3>Discuss</h3>
+        <p>Start or join conversations — short posts, long-form threads, or quick questions.</p>
+      </div>
+      <div class="feature">
+        <h3>Connect</h3>
+        <p>Follow members, like posts, and build your circle.</p>
+      </div>
+      <div class="feature">
+        <h3>Learn</h3>
+        <p>Save posts, follow discussions, and explore community insights.</p>
+      </div>
+      <div class="feature feature-cta">
+        <h3>Community Tools</h3>
+        <p>Moderation, analytics, private groups, and badges for active contributors.</p>
+        <a href="/pricing" class="btn btn-outline">See Plans</a>
+      </div>
+    </section>
+
+    <section class="showcase">
+      <div class="container">
+        <h2>Recent Posts</h2>
+        <div class="post-grid">
+          <a class="post" href="#">How to start a weekend project <span class="count">• 30 replies</span></a>
+          <a class="post" href="#">Best productivity hacks <span class="count">• 18 replies</span></a>
+          <a class="post" href="#">Portfolio design critique <span class="count">• 52 replies</span></a>
+          <a class="post" href="#">Remote work setup tips <span class="count">• 22 replies</span></a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container footer-inner">
+      <p>© <span id="year">2025</span> Forum. Crafted with care. <a href="/about">About</a> • <a href="/terms">Terms</a></p>
+    </div>
+  </footer>
+
+  <script>
+    document.getElementById('year').textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>

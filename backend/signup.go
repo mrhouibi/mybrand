@@ -1,7 +1,10 @@
 package backend
 
 import (
+	"context"
 	"crypto/rand"
+	"encoding/hex"
+	"log"
 	"net/http"
 	"regexp"
 	"time"
@@ -11,19 +14,38 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-var emailRe = regexp.MustCompile(`^[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}$`)
+var (
+	emailRe    = regexp.MustCompile(`^[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}$`)
+	usernameRe = regexp.MustCompile(`^[\p{L}\p{N}_\-. ]{2,50}$`)
+	msgs       = map[string]string{
+		"InvalidForm":            "Invalid form",
+		"AllFieldsRequired":      "All fields are required",
+		"InvalidUsername":        "Invalid username (2-50 chars)",
+		"InvalidEmail":           "Invalid email",
+		"ShortPassword":          "Password must be at least 8 characters",
+		"DatabaseError":          "Database error",
+		"EmailAlreadyTaken":      "Email already taken",
+		"UsernameAlreadyTaken":   "Username already taken",
+		"ErrorCreatingUser":      "Error creating user",
+		"ServerError":            "Server error",
+		"TokenGenerationFailure": "Failed to generate session token",
+		"ErrorCreatingSession":   "Error creating session",
+	}
+)
 
 func SignupHandler(w http.ResponseWriter, r *http.Request) {
 	switch r.Method {
 	case http.MethodGet:
 		if err := templates.ExecuteTemplate(w, "signup.html", map[string]string{"Error": ""}); err != nil {
-			http.Error(w, "server error", http.StatusInternalServerError)
+			log.Printf("template render error (GET /signup): %v", err)
+			http.Error(w, msgs["ServerError"], http.StatusInternalServerError)
 		}
 		return
 
 	case http.MethodPost:
 		if err := r.ParseForm(); err != nil {
-			templates.ExecuteTemplate(w, "signup.html", map[string]string{"Error": "Invalid form"})
+			log.Printf("parse form error: %v", err)
+			http.Error(w, msgs["InvalidForm"], http.StatusBadRequest)
 			return
 		}
 
@@ -31,71 +53,97 @@ func SignupHandler(w http.ResponseWriter, r *http.Request) {
 		email := r.FormValue("email")
 		password := r.FormValue("password")
 
-		// validations
 		if username == "" || email == "" || password == "" {
-			templates.ExecuteTemplate(w, "signup.html", map[string]string{"Error": "All fields are required"})
+			http.Error(w, msgs["AllFieldsRequired"], http.StatusBadRequest)
+			return
+		}
+		if !usernameRe.MatchString(username) {
+			http.Error(w, msgs["InvalidUsername"], http.StatusBadRequest)
 			return
 		}
 		if !emailRe.MatchString(email) {
-			templates.ExecuteTemplate(w, "signup.html", map[string]string{"Error": "Invalid email"})
+			http.Error(w, msgs["InvalidEmail"], http.StatusBadRequest)
 			return
 		}
 		if len(password) < 8 {
-			templates.ExecuteTemplate(w, "signup.html", map[string]string{"Error": "Password must be >= 8 chars"})
+			http.Error(w, msgs["ShortPassword"], http.StatusBadRequest)
 			return
 		}
 
-		var exists int
-		err := database.DB.QueryRow("SELECT COUNT(1) FROM users WHERE email = ?", email).Scan(&exists)
-		if err != nil {
-			templates.ExecuteTemplate(w, "signup.html", map[string]string{"Error": "Database error"})
+		ctx, cancel := context.WithTimeout(r.Context(), 5*time.Second)
+		defer cancel()
+
+		// Check email and username uniqueness
+		var emailExists, usernameExists int
+		if err := database.DB.QueryRowContext(ctx, "SELECT COUNT(1) FROM users WHERE email = ?", email).Scan(&emailExists); err != nil {
+			log.Printf("email uniqueness check error: %v", err)
+			http.Error(w, msgs["DatabaseError"], http.StatusInternalServerError)
 			return
 		}
-		if exists > 0 {
-			templates.ExecuteTemplate(w, "signup.html", map[string]string{"Error": "Email already taken"})
+		if emailExists > 0 {
+			http.Error(w, msgs["EmailAlreadyTaken"], http.StatusConflict)
+			return
+		}
+
+		if err := database.DB.QueryRowContext(ctx, "SELECT COUNT(1) FROM users WHERE username = ?", username).Scan(&usernameExists); err != nil {
+			log.Printf("username uniqueness check error: %v", err)
+			http.Error(w, msgs["DatabaseError"], http.StatusInternalServerError)
+			return
+		}
+		if usernameExists > 0 {
+			http.Error(w, msgs["UsernameAlreadyTaken"], http.StatusConflict)
 			return
 		}
 
 		hash, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
 		if err != nil {
-			templates.ExecuteTemplate(w, "signup.html", map[string]string{"Error": "Server error"})
+			log.Printf("bcrypt generate error: %v", err)
+			http.Error(w, msgs["ServerError"], http.StatusInternalServerError)
 			return
 		}
 
-		tx, err := database.DB.Begin()
+		tx, err := database.DB.BeginTx(ctx, nil)
 		if err != nil {
-			templates.ExecuteTemplate(w, "signup.html", map[string]string{"Error": "Server error"})
+			log.Printf("db begin tx error: %v", err)
+			http.Error(w, msgs["ServerError"], http.StatusInternalServerError)
 			return
 		}
-		defer tx.Rollback()
+		defer func() { _ = tx.Rollback() }()
 
-		res, err := tx.Exec("INSERT INTO users (username, email, password_hash, created_at) VALUES (?, ?, ?, datetime('now'))", username, email, string(hash))
+		createdAt := time.Now().UTC().Format("2006-01-02 15:04:05")
+		res, err := tx.ExecContext(ctx, "INSERT INTO users (username, email, password_hash, created_at) VALUES (?, ?, ?, ?)",
+			username, email, string(hash), createdAt)
 		if err != nil {
-			templates.ExecuteTemplate(w, "signup.html", map[string]string{"Error": "Error creating user"})
+			log.Printf("insert user error: %v", err)
+			http.Error(w, msgs["ErrorCreatingUser"], http.StatusInternalServerError)
 			return
 		}
 
 		userID, err := res.LastInsertId()
 		if err != nil {
-			templates.ExecuteTemplate(w, "signup.html", map[string]string{"Error": "Server error"})
+			log.Printf("last insert id error: %v", err)
+			http.Error(w, msgs["ServerError"], http.StatusInternalServerError)
 			return
 		}
 
-		token := generateRandomToken()
-		if token == "" {
-			templates.ExecuteTemplate(w, "signup.html", map[string]string{"Error": "Failed to generate session token"})
-			return
-		}
-		exp := time.Now().Add(24 * time.Hour)
-
-		_, err = tx.Exec("INSERT INTO sessions(token, user_id, expires_at) VALUES (?, ?, ?)", token, userID, exp.Format("2006-01-02 15:04:05"))
+		token, err := generateRandomToken()
 		if err != nil {
-			templates.ExecuteTemplate(w, "signup.html", map[string]string{"Error": "Error creating session"})
+			log.Printf("generate token error: %v", err)
+			http.Error(w, msgs["TokenGenerationFailure"], http.StatusInternalServerError)
+			return
+		}
+		exp := time.Now().Add(24 * time.Hour).UTC()
+
+		_, err = tx.ExecContext(ctx, "INSERT INTO sessions (token, user_id, expires_at) VALUES (?, ?, ?)", token, userID, exp.Format("2006-01-02 15:04:05"))
+		if err != nil {
+			log.Printf("insert session error: %v", err)
+			http.Error(w, msgs["ErrorCreatingSession"], http.StatusInternalServerError)
 			return
 		}
 
 		if err := tx.Commit(); err != nil {
-			templates.ExecuteTemplate(w, "signup.html", map[string]string{"Error": "Server error"})
+			log.Printf("tx commit error: %v", err)
+			http.Error(w, msgs["ServerError"], http.StatusInternalServerError)
 			return
 		}
 
@@ -106,27 +154,20 @@ func SignupHandler(w http.ResponseWriter, r *http.Request) {
 			Path:     "/",
 			HttpOnly: true,
 			SameSite: http.SameSiteLaxMode,
+			Secure:   true, // Enable in production
 		})
 
 		http.Redirect(w, r, "/", http.StatusSeeOther)
+
 	default:
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 	}
 }
 
-func generateRandomToken() string {
+func generateRandomToken() (string, error) {
 	b := make([]byte, 32)
 	if _, err := rand.Read(b); err != nil {
-		return ""
+		return "", err
 	}
-	return hexEncode(b)
-}
-func hexEncode(b []byte) string {
-	const hexChars = "0123456789abcdef"
-	out := make([]byte, len(b)*2)
-	for i, v := range b {
-		out[i*2] = hexChars[v>>4]
-		out[i*2+1] = hexChars[v&0x0f]
-	}
-	return string(out)
+	return hex.EncodeToString(b), nil
 }

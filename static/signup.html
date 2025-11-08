@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Sign up | Forum</title>
-  <link rel="stylesheet" href="/static/styles.css">
+  <link rel="stylesheet" href="/static/styles.css" />
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -13,25 +13,28 @@
       justify-content: center;
       align-items: center;
       height: 100vh;
+      margin: 0;
     }
     .login-box {
       background: white;
       padding: 2rem;
       border-radius: 12px;
       box-shadow: 0 0 15px rgba(0,0,0,0.1);
-      width: 300px;
+      width: 320px;
     }
     h2 {
       text-align: center;
       margin-bottom: 1rem;
+      text-transform: capitalize;
     }
-    input[type="email"], input[type="password"] , input[type = "name"] {
+    input[type="email"], input[type="password"], input[type="text"] {
       width: 100%;
       padding: 10px;
       margin-bottom: 1rem;
       border: 1px solid #ccc;
       border-radius: 6px;
       font-size: 14px;
+      box-sizing: border-box;
     }
     button {
       width: 100%;
@@ -47,7 +50,7 @@
       background-color: #0056b3;
     }
     .error {
-      color: red;
+      color: #b00020;
       text-align: center;
       margin-bottom: 1rem;
     }
@@ -59,26 +62,38 @@
       color: #007BFF;
       text-decoration: none;
     }
+    label {
+      display: block;
+      font-size: 13px;
+      margin-bottom: 6px;
+      color: #333;
+    }
   </style>
 </head>
 <body>
   <div class="login-box">
     <h2>signup</h2>
-    <form method="POST" action="/signup">
-        <input type="name" name="name" placeholder="Name" required />
-      <input type="email" name="email" placeholder="Email" required />
-      <input type="password" name="password" placeholder="Password" required />
+
+    {{if .Error}}
+      <div class="error">{{.Error}}</div>
+    {{end}}
+
+    <form method="POST" action="/signup" autocomplete="off" novalidate>
+      <label for="username">Name</label>
+      <input id="username" name="username" type="text" placeholder="Your name" required maxlength="50" />
+
+      <label for="email">Email</label>
+      <input id="email" name="email" type="email" placeholder="you@example.com" required />
+
+      <label for="password">Password</label>
+      <input id="password" name="password" type="password" placeholder="At least 8 characters" required minlength="8" />
+
       <button type="submit">Sign up</button>
     </form>
-    
+
     <div class="link">
-      <p>u have already account <a href="/login">login</a></p>
+      <p>already have an account? <a href="/login">login</a></p>
     </div>
   </div>
-  <div class="error">
-{{if .Error}}
-  {{.Error}}
-{{end}}
-</div>
 </body>
 </html>
