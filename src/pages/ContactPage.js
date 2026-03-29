@@ -149,25 +149,7 @@ function ContactPage() {
                 </div>
               </div>
 
-              <div className="form-group">
-                <label htmlFor="service">Service Interested In</label>
-                <select
-                  id="service"
-                  name="service"
-                  value={formData.service}
-                  onChange={handleChange}
-                  required
-                >
-                  <option value="">Select a service</option>
-                  <option value="web">Web Development</option>
-                  <option value="mobile">Mobile App Development</option>
-                  <option value="design">UI/UX Design</option>
-                  <option value="cloud">Cloud & DevOps</option>
-                  <option value="analytics">Data Analytics</option>
-                  <option value="security">Cybersecurity</option>
-                  <option value="other">Other</option>
-                </select>
-              </div>
+           
 
               <div className="form-group">
                 <label htmlFor="message">Your Message</label>

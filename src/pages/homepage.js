@@ -29,28 +29,6 @@ function HomePage() {
     },
    
   ];
-
-  const testimonials = [
-    {
-      name: 'Sarah Johnson',
-      role: 'CEO, TechStart',
-      initials: 'SJ',
-      quote: 'Working with this team was an absolute game-changer. They delivered beyond our expectations and the results speak for themselves.',
-    },
-    {
-      name: 'Michael Chen',
-      role: 'CTO, DataFlow',
-      initials: 'MC',
-      quote: 'The technical expertise and attention to detail is unmatched. Our platform performance improved by 300% after their optimization.',
-    },
-    {
-      name: 'Emily Davis',
-      role: 'Founder, DesignHub',
-      initials: 'ED',
-      quote: 'From concept to launch, they guided us every step of the way. The design quality and user experience exceeded all expectations.',
-    },
-  ];
-
   return (
     <div ref={pageRef} className="page-enter">
       {/* ======== HERO SECTION ======== */}
@@ -87,20 +65,7 @@ function HomePage() {
                 Our Services
               </Link>
             </div>
-            <div className="hero-stats">
-              <div className="hero-stat">
-                <div className="hero-stat-number gradient-text">250+</div>
-                <div className="hero-stat-label">Projects Completed</div>
-              </div>
-              <div className="hero-stat">
-                <div className="hero-stat-number gradient-text">50+</div>
-                <div className="hero-stat-label">Team Members</div>
-              </div>
-              <div className="hero-stat">
-                <div className="hero-stat-number gradient-text">99%</div>
-                <div className="hero-stat-label">Client Satisfaction</div>
-              </div>
-            </div>
+           
           </div>
 
           <div className="hero-visual">
@@ -173,40 +138,8 @@ function HomePage() {
         </div>
       </section>
 
-      {/* ======== TESTIMONIALS ======== */}
-      <section className="section">
-        <div className="container">
-          <h2 className="section-title">
-            What Our <span className="gradient-text">Clients Say</span>
-          </h2>
-          <p className="section-subtitle">
-            Don't just take our word for it. Here's what our clients have to
-            say about working with us.
-          </p>
-          <div className="testimonials-grid">
-            {testimonials.map((t, i) => (
-              <div className="testimonial-card" key={i}>
-                <div className="testimonial-stars">
-                  <i className="fas fa-star"></i>
-                  <i className="fas fa-star"></i>
-                  <i className="fas fa-star"></i>
-                  <i className="fas fa-star"></i>
-                  <i className="fas fa-star"></i>
-                </div>
-                <blockquote>"{t.quote}"</blockquote>
-                <div className="testimonial-author">
-                  <div className="testimonial-author-avatar">{t.initials}</div>
-                  <div className="testimonial-author-info">
-                    <strong>{t.name}</strong>
-                    <span>{t.role}</span>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
+   
+    
       {/* ======== CTA SECTION ======== */}
       <section className="cta-section">
         <div className="container">

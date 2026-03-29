@@ -12,10 +12,9 @@ function AboutPage() {
   }, []);
 
   const team = [
-    { name: 'Alex Rivera', role: 'Founder & CEO', initials: 'AR', bio: 'Visionary leader with 15+ years in tech and a passion for innovation.' },
-    { name: 'Jordan Lee', role: 'Lead Designer', initials: 'JL', bio: 'Award-winning designer who creates intuitive and beautiful experiences.' },
-    { name: 'Sam Patel', role: 'CTO', initials: 'SP', bio: 'Full-stack architect with expertise in scalable cloud solutions.' },
-    { name: 'Casey Morgan', role: 'Head of Marketing', initials: 'CM', bio: 'Growth strategist who turns brands into household names.' },
+    { name: 'Rhouibi mohammed', role: 'CEO & WEB devlopper', initials: 'JL' },
+    { name: 'EL hamel Zakaria', role: 'Head of Marketing', initials: 'AR' },
+    { name: 'Nabil chakroun', role: 'HEAD OF TECH', initials: 'SP' },
   ];
 
   const values = [
@@ -40,53 +39,7 @@ function AboutPage() {
         </div>
       </section>
 
-      {/* ======== OUR STORY ======== */}
-      <section className="section">
-        <div className="container">
-          <div className="about-grid">
-            <div className="about-image">
-              <i className="fas fa-building"></i>
-            </div>
-            <div className="about-text">
-              <h2>Our <span className="gradient-text">Story</span></h2>
-              <p>
-                Founded in 2018, MyBrand started as a small team of three
-                developers with a shared vision: to make high-quality digital
-                solutions accessible to businesses of all sizes.
-              </p>
-              <p>
-                Today, we've grown into a team of 50+ talented professionals
-                serving clients worldwide. We've completed over 250 projects
-                and continue to push the boundaries of what's possible in
-                digital technology.
-              </p>
-              <p>
-                Our journey has been driven by a simple belief — great
-                technology should solve real problems and create genuine
-                value for the people who use it.
-              </p>
-              <div className="about-features">
-                <div className="about-feature">
-                  <i className="fas fa-check-circle"></i>
-                  <span>250+ Projects Delivered</span>
-                </div>
-                <div className="about-feature">
-                  <i className="fas fa-check-circle"></i>
-                  <span>50+ Team Members</span>
-                </div>
-                <div className="about-feature">
-                  <i className="fas fa-check-circle"></i>
-                  <span>15+ Countries Served</span>
-                </div>
-                <div className="about-feature">
-                  <i className="fas fa-check-circle"></i>
-                  <span>99% Client Satisfaction</span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
+      
 
       {/* ======== OUR VALUES ======== */}
       <section className="section" style={{ background: 'var(--gray-100)' }}>

@@ -43,11 +43,8 @@ function Footer() {
           <div className="footer-column">
             <h4>Services</h4>
             <ul>
-              <li><a href="#!">Web Development</a></li>
-              <li><a href="#!">Mobile Apps</a></li>
+              <li><a href="#!">Web Development</a></li>        
               <li><a href="#!">UI/UX Design</a></li>
-              <li><a href="#!">Cloud Solutions</a></li>
-              <li><a href="#!">Consulting</a></li>
             </ul>
           </div>
 
